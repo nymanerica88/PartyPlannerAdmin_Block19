@@ -117,24 +117,35 @@ async function deleteParty(id) {
   }
 }
 
+//asynchoronous function to update a party by id
 async function updateParty(id, updatedPartyObj) {
+  //beginning of the try/catch error handling block
   try {
     await fetch(`${API}/events/${id}`, {
+      //update the data at the URL specified
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedPartyObj),
     });
+    //if the SelectedParty and the selected party id match the ID
     if (selectedParty && selectedParty.id === id) {
+      //await response from getParty by id
       await getParty(id);
+      //otherwise
     } else {
+      //awaot response from getParties
       await getParties();
     }
+    //catch errors (if any)
   } catch (error) {
+    //console.log errors (if caught)
     console.error("There was an Error /PUT", error);
   }
 }
 
 /** Updates state with all RSVPs from the API */
+
+//see explanations above; function returns the RSVPs
 async function getRsvps() {
   try {
     const response = await fetch(API + "/rsvps");
@@ -147,6 +158,8 @@ async function getRsvps() {
 }
 
 /** Updates state with all guests from the API */
+
+//see explanation above; function returns a guest list
 async function getGuests() {
   try {
     const response = await fetch(API + "/guests");
@@ -209,13 +222,23 @@ function SelectedParty() {
   `;
   $party.querySelector("GuestList").replaceWith(GuestList());
 
+  //const $del - stores the element in a variable for later use;
+  ////the dollar sign is an indicator of a DOM element
+  //$party is a DOM element that represents a single party
+  //.querySelector(".delete")
   const $del = $party.querySelector(".delete");
+  //When the button is clicked, run this function
   $del.addEventListener("click", async function (event) {
+    //prevent the default function, so only the custom code runs
     event.preventDefault();
+    //variable named id; converts the string into a number
+    ////(event.currentTarget.dataset.id) - reads the value of the custom
+    ///data id and returns it as a string;
     const id = Number(event.currentTarget.dataset.id);
     await deleteParty(id);
   });
 
+  //returns the party
   return $party;
 }
 
@@ -255,7 +278,12 @@ function NewPartyForm() {
   $form.addEventListener("submit", async function (event) {
     event.preventDefault();
     const data = new FormData($form);
+    //retrieves the value from the date input field and stores
+    //that string in a variable named dateFromForm
     const dateFromForm = data.get("date");
+    //new Date(dateFromForm) = creates a JS onject using the date from the form
+    ////.toISOString() converts the date to an ISO String, which is a standard
+    ////notation string formatted date
     const isoDate = new Date(dateFromForm).toISOString();
     const newPartyObj = {
       name: data.get("name"),
