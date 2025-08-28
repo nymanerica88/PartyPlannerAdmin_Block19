@@ -48,7 +48,7 @@ async function addParty(partyObj) {
   try {
     //await pauses the code flow until a response is returned
     //fetch is a get request that accepts at least 1 argument; can take two
-    //*** */`${API}/events` (per AI Bot) is building a URL that consists of the
+    //*** */`${API}/events` is building a URL that consists of the
     ////concatenated API+events, separated by a backslash
     await fetch(`${API}/events`, {
       //sets the HTTPS method to post
