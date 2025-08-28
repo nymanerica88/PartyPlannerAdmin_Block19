@@ -1,22 +1,43 @@
 // === Constants ===
+
+//This is the root URL of the API
 const BASE = "https://fsa-crud-2aa9294fe819.herokuapp.com/api";
+//This is the scope of data for the API
 const COHORT = "/2506-FTB-CT-WEB-PT"; // Make sure to change this!
+//concatenation that creates the full API prefix to use in all requests
 const API = BASE + COHORT;
 
 // === State ===
+
+//variable named parties, empty array to hold the parties returned
+//from the API
 let parties = [];
+//variable named selectedParty, empty array to hold the details of the
+//selectedParty from the API
 let selectedParty;
+//variable named rsvps, empty array to hold the rsvp defails from
+//the API
 let rsvps = [];
+//variable named guests, empty array to hold the guest details from the API
 let guests = [];
 
 /** Updates state with all parties from the API */
 async function getParties() {
+  //start of the try/catch error handling block
   try {
+    //get request (fetch); await makes the application wait
+    // until the request result is returned
     const response = await fetch(API + "/events");
+    //turns the JSON body into a JS Object
     const result = await response.json();
+    //sets the variable parties to the returned data from the
+    // get (fetch) request
     parties = result.data;
+    //refresh the page to display new update
     render();
+    //catch errors
   } catch (e) {
+    //console.log the error if found
     console.error(e);
   }
 }
@@ -219,6 +240,8 @@ function render() {
       <section>
         <h2>Upcoming Parties</h2>
         <PartyList></PartyList>
+        <h2>New Party Submission Form</h2>
+        <NewPartyForm></NewPartyForm>
       </section>
       <section id="selected">
         <h2>Party Details</h2>
