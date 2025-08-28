@@ -42,39 +42,77 @@ async function getParties() {
   }
 }
 
+//asynchronous function to create a new Party
 async function addParty(partyObj) {
+  //beginning of the try/catch error block
   try {
+    //await pauses the code flow until a response is returned
+    //fetch is a get request that accepts at least 1 argument; can take two
+    //*** */`${API}/events` (per AI Bot) is building a URL that consists of the
+    ////concatenated API+events, separated by a backslash
     await fetch(`${API}/events`, {
+      //sets the HTTPS method to post
       method: "POST",
+      //adds headers to the request; lets the server know that
+      //we're dealing with JSON text
       headers: { "Content-Type": "application/json" },
+      //converts the JSON text into a string
       body: JSON.stringify(partyObj),
     });
+    //pauses the execution until a response is received from getParties
     await getParties();
+    //catches error
   } catch (error) {
+    //console.log the error if an error is caught
     console.error(error, "Error with /POST");
   }
 }
 
 /** Updates state with a single party from the API */
+
+//asynchronous function to retrieve a single party by id
 async function getParty(id) {
+  //beginning of the try/catch error handling block
   try {
+    //await pauses the code flow until a response is returned
+    //fetch is a get request that accepts at least 1 argument; can take two
+    //(API + "/events/" + id) is building a URL that consists of the
+    ////concatenated API+events+id
     const response = await fetch(API + "/events/" + id);
+    //turns the JSON body into a JS Object
     const result = await response.json();
+    //sets Selected Paty equal to the resulting data from the get request
     selectedParty = result.data;
+    //refreshes the page to see the update
     render();
+    //catches errors (if any)
   } catch (e) {
+    //console logs the error if caught
     console.error(e);
   }
 }
 
+//asynchronous function to delete a single party by id
 async function deleteParty(id) {
+  //beginning of the try/catch error handling
   try {
+    //await pauses the code flow until a response is returned
+    //fetch is a get request that accepts at least 1 argument; can take two
+    //(API + "/events/" + id) is building a URL that consists of the
+    ////concatenated API+events+id;
+    //{ method: "DELETE" } sends the delete request to the API at the URL specified
     await fetch(`${API}/events/${id}`, { method: "DELETE" });
+    //if the selected party and the selected party id equal the same id number
     if (selectedParty && selectedParty.id === id) {
+      //set the selected party to null; i.e. clear the section so that the
+      //user interface (UI) is no longer showing the data for the deleted party
       selectedParty = null;
     }
+    //await the execution of getParties to complete
     await getParties();
+    //catch error
   } catch (error) {
+    //console log message if error
     console.error("There was an error with /DELETE", error);
   }
 }
@@ -86,7 +124,6 @@ async function updateParty(id, updatedPartyObj) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedPartyObj),
     });
-    // If we're in single view of this recipe, refresh that; otherwise refresh list
     if (selectedParty && selectedParty.id === id) {
       await getParty(id);
     } else {
