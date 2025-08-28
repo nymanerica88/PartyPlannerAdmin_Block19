@@ -1,6 +1,6 @@
 // === Constants ===
 const BASE = "https://fsa-crud-2aa9294fe819.herokuapp.com/api";
-const COHORT = ""; // Make sure to change this!
+const COHORT = "/2506-FTB-CT-WEB-PT"; // Make sure to change this!
 const API = BASE + COHORT;
 
 // === State ===
@@ -21,6 +21,19 @@ async function getParties() {
   }
 }
 
+async function addParty(partyObj) {
+  try {
+    await fetch(`${API}/events`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(partyObj),
+    });
+    await getParties();
+  } catch (error) {
+    console.error(error, "Error with /POST");
+  }
+}
+
 /** Updates state with a single party from the API */
 async function getParty(id) {
   try {
@@ -30,6 +43,36 @@ async function getParty(id) {
     render();
   } catch (e) {
     console.error(e);
+  }
+}
+
+async function deleteParty(id) {
+  try {
+    await fetch(`${API}/events/${id}`, { method: "DELETE" });
+    if (selectedParty && selectedParty.id === id) {
+      selectedParty = null;
+    }
+    await getParties();
+  } catch (error) {
+    console.error("There was an error with /DELETE", error);
+  }
+}
+
+async function updateParty(id, updatedPartyObj) {
+  try {
+    await fetch(`${API}/events/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedPartyObj),
+    });
+    // If we're in single view of this recipe, refresh that; otherwise refresh list
+    if (selectedParty && selectedParty.id === id) {
+      await getParty(id);
+    } else {
+      await getParties();
+    }
+  } catch (error) {
+    console.error("There was an Error /PUT", error);
   }
 }
 
@@ -128,6 +171,35 @@ function GuestList() {
   return $ul;
 }
 
+function NewPartyForm() {
+  const $form = document.createElement("form");
+  $form.innerHTML = `
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" required>
+            <label for="date">Date</label>
+            <input type="date" name="date" id="date">
+            <label for="location">Location</label>
+            <input type="text" name="location" id="location">
+            <label for="description">Description</label>
+            <input type="text" name="description" id="description">
+            <button>Add New Party</button>
+  `;
+  $form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const data = new FormData($form);
+    const dateFromForm = data.get("date");
+    const isoDate = new Date(dateFromForm).toISOString();
+    const newPartyObj = {
+      name: data.get("name"),
+      date: isoDate,
+      location: data.get("location"),
+      description: data.get("description"),
+    };
+    await addParty(newPartyObj);
+    $form.reset();
+  });
+  return $form;
+}
 // === Render ===
 function render() {
   const $app = document.querySelector("#app");
@@ -141,12 +213,14 @@ function render() {
       <section id="selected">
         <h2>Party Details</h2>
         <SelectedParty></SelectedParty>
+        <NewPartyForm></NewPartyForm>
       </section>
     </main>
   `;
 
   $app.querySelector("PartyList").replaceWith(PartyList());
   $app.querySelector("SelectedParty").replaceWith(SelectedParty());
+  $app.querySelector("NewPartyForm").replaceWith(NewPartyForm());
 }
 
 async function init() {
