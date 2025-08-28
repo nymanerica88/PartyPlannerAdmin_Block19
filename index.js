@@ -154,8 +154,8 @@ function SelectedParty() {
   const $del = $party.querySelector(".delete");
   $del.addEventListener("click", async function (event) {
     event.preventDefault();
-    const id = Number(event.currentTarget.dataset.id); // get id from data-id
-    await deleteParty(id); // call your delete function
+    const id = Number(event.currentTarget.dataset.id);
+    await deleteParty(id);
   });
 
   return $party;
