@@ -145,8 +145,18 @@ function SelectedParty() {
     <address>${selectedParty.location}</address>
     <p>${selectedParty.description}</p>
     <GuestList></GuestList>
+    <div class="single-actions">
+        <a href="#" class="delete" data-id=${selectedParty.id}>Delete</a>
+    </div>
   `;
   $party.querySelector("GuestList").replaceWith(GuestList());
+
+  const $del = $party.querySelector(".delete");
+  $del.addEventListener("click", async function (event) {
+    event.preventDefault();
+    const id = Number(event.currentTarget.dataset.id); // get id from data-id
+    await deleteParty(id); // call your delete function
+  });
 
   return $party;
 }
